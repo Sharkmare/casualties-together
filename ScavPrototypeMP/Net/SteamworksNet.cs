@@ -2401,6 +2401,12 @@ public class TransportSteamworks : NetTransportBase {
         }
 
         var playerEntity = BasePlayer.ServerCreatePlayer(steamID.ToString(), steamID, userInfo.color, false);
+        if (playerEntity.player != null && CharacterTable.IsKnown(userInfo.character)) {
+            playerEntity.player.ReportedCharacter = userInfo.character;
+        }
+        if (userInfo.characterTableFingerprint != 0 && userInfo.characterTableFingerprint != CharacterTable.Fingerprint()) {
+            log.warn($"{userInfo.userName} has a different character table ({userInfo.characterTableFingerprint:X8} against {CharacterTable.Fingerprint():X8}); ids the other side does not know fall back to the base character");
+        }
 
         try {
             SteamIDToNetPlayerDict[steamID] = playerEntity.player;

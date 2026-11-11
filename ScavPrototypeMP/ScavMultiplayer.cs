@@ -1162,6 +1162,8 @@ S_LerpFactor: {_entityManager.LerpFactor}";
 
         credentials_buffer.Put(CLIENT_JOIN_SECRET, true);
         credentials_buffer.PutArray(GetModGUIDs());
+        credentials_buffer.Put(LocalCharacter.Hint);
+        credentials_buffer.Put(CharacterTable.Fingerprint());
 
 
         credentials_buffer.CompressWriter(l);
@@ -1178,6 +1180,8 @@ S_LerpFactor: {_entityManager.LerpFactor}";
         public Color24 color;
         public string[] modlist;
         public HashSet<string> modlist_hashset;
+        public byte character;
+        public uint characterTableFingerprint;
     }
 
     public static bool ReadClientConnectIntroductionPacket(NetDataReader credentialsBuffer, ref IntroductionPlayerInfo userInfo) {
@@ -1186,6 +1190,8 @@ S_LerpFactor: {_entityManager.LerpFactor}";
         userInfo.userName = "NONAME";
         userInfo.secret = "0";
         userInfo.modlist = null;
+        userInfo.character = CharacterChoice.NoChoice;
+        userInfo.characterTableFingerprint = 0;
         bool aaaaaaaaaaa = true;
         try {
             credentialsBuffer.Get(out userInfo.fileHash);
@@ -1197,6 +1203,12 @@ S_LerpFactor: {_entityManager.LerpFactor}";
             if (!credentialsBuffer.EndOfData) { // 4.0.0
                 credentialsBuffer.Get(out userInfo.secret, true);
                 credentialsBuffer.TryGetStringArray(out userInfo.modlist);
+                if (!credentialsBuffer.EndOfData) {
+                    credentialsBuffer.Get(out userInfo.character);
+                }
+                if (!credentialsBuffer.EndOfData) {
+                    credentialsBuffer.Get(out userInfo.characterTableFingerprint);
+                }
             } 
         } catch (Exception e) {
             aaaaaaaaaaa = false;

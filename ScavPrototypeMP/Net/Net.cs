@@ -1057,6 +1057,12 @@ public class TransportLiteNetLib : NetTransportBase, INetEventListener {
 #endif
 
         var playerEntity = BasePlayer.ServerCreatePlayer(userInfo.userName, 0, userInfo.color, false);
+        if (playerEntity.player != null && CharacterTable.IsKnown(userInfo.character)) {
+            playerEntity.player.ReportedCharacter = userInfo.character;
+        }
+        if (userInfo.characterTableFingerprint != 0 && userInfo.characterTableFingerprint != CharacterTable.Fingerprint()) {
+            log.warn($"{userInfo.userName} has a different character table ({userInfo.characterTableFingerprint:X8} against {CharacterTable.Fingerprint():X8}); ids the other side does not know fall back to the base character");
+        }
 
         ClientIdToPeerDict[playerEntity.OwnerId] = newpeer;
 
