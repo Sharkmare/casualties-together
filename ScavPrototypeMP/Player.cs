@@ -1110,6 +1110,7 @@ public class ScavPlayer : MonoBehaviour {
 
 
     public const double FINGERPOINTINGTIME_MAX = 3.0;
+    public byte ReportedCharacter = CharacterChoice.NoChoice;
     public bool is_pointingfingerat = false;
     public byte is_pointingfingeratTYPE = 0;
     public double is_pointingfingeratTIME = -9990.0;

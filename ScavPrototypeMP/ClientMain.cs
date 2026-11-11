@@ -496,81 +496,51 @@ public class ClientMain : MonoBehaviour {
         public HingeJoint2D hinge;
     }
 
+    internal static void RecordHingeStates(GameObject source) {
+        foreach (var hinge in source.GetComponentsInChildren<HingeJoint2D>(true)) {
+            var saved = hinge.AddComponent<SavedHingeJointState>();
+            saved.a = hinge.transform.localPosition;
+            saved.b = hinge.transform.localRotation;
+            saved.aa = hinge.connectedBody.transform.localPosition;
+            saved.bb = hinge.connectedBody.transform.localRotation;
+            saved.useLimits = hinge.useLimits;
+            saved.limitsmax = hinge.limits.max;
+            saved.limitsmin = hinge.limits.min;
+            saved.referenceAngle = hinge.referenceAngle;
+            saved.hinge = hinge;
+            saved.connectedBody = hinge.connectedBody;
+        }
+    }
+
+    static void SaveHingeStatesAndKeepPrefab(GameObject source) {
+        RecordHingeStates(source);
+        ServerMain.CHARACTER_PREFAB = GameObject.Instantiate(source);
+        ServerMain.CHARACTER_PREFAB.SetActive(false);
+        log.l($"character prefab source: {source.name} charType={source.GetComponentInChildren<Body>(true)?.charType}");
+        CharacterPrefabs.Build();
+    }
+
     internal static void _InitializePlayerCharacter() {
+        if (ServerMain.CHARACTER_PREFAB != null) return;
 
-        if (ServerMain.CHARACTER_PREFAB == null) {
-
-            var og_char = GameObject.Find("Experiment"); // player character is stored only in the scene, i must get it
-
-            if (og_char != null) {
-                {
-                    var a = og_char.GetComponentsInChildren<HingeJoint2D>();
-                    foreach (var hinge in a) {
-                        var ogggg = hinge.AddComponent<SavedHingeJointState>();
-                        ogggg.a = hinge.transform.localPosition;
-                        ogggg.b = hinge.transform.localRotation;
-                        ogggg.aa = hinge.connectedBody.transform.localPosition;
-                        ogggg.bb = hinge.connectedBody.transform.localRotation;
-                        ogggg.useLimits = hinge.useLimits;
-                        ogggg.limitsmax = hinge.limits.max;
-                        ogggg.limitsmin = hinge.limits.min;
-                        ogggg.referenceAngle = hinge.referenceAngle;
-
-                        ogggg.hinge = hinge;
-
-                        ogggg.connectedBody = hinge.connectedBody;
-                    }
-                }
-
-                ServerMain.CHARACTER_PREFAB = GameObject.Instantiate(og_char);
-
-                ServerMain.CHARACTER_PREFAB.SetActive(false);
-            } else {
-                // Spawn the run body from a prefab instead of keeping Experiment in the scene. We want to use the actual character here
-                Body fallback_body = PlayerCamera.main != null ? PlayerCamera.main.body : null;
-                var fallback_char = fallback_body != null ? fallback_body.gameObject : null;
-
-                if (fallback_char == null) {
-                    foreach (var b in UnityEngine.Object.FindObjectsOfType<Body>()) {
-                        if (b.GetComponent<NetBody>() == null && !b.CompareTag("Enemy") && b.transform.childCount > 0) {
-                            fallback_char = b.gameObject;
-                            break;
-                        }
-                    }
-                }
-
-                if (fallback_char != null) {
-                    {
-                        var a = fallback_char.GetComponentsInChildren<HingeJoint2D>();
-                        foreach (var hinge in a) {
-                            var ogggg = hinge.AddComponent<SavedHingeJointState>();
-                            ogggg.a = hinge.transform.localPosition;
-                            ogggg.b = hinge.transform.localRotation;
-                            ogggg.aa = hinge.connectedBody.transform.localPosition;
-                            ogggg.bb = hinge.connectedBody.transform.localRotation;
-                            ogggg.useLimits = hinge.useLimits;
-                            ogggg.limitsmax = hinge.limits.max;
-                            ogggg.limitsmin = hinge.limits.min;
-                            ogggg.referenceAngle = hinge.referenceAngle;
-
-                            ogggg.hinge = hinge;
-
-                            ogggg.connectedBody = hinge.connectedBody;
-                        }
-                    }
-
-                    ServerMain.CHARACTER_PREFAB = GameObject.Instantiate(fallback_char);
-
-                    ServerMain.CHARACTER_PREFAB.SetActive(false);
-                } else {
-                    if (Net.IsRunning) {
-                        Multiplayer.DoMultiplayerStatusMessageError("PLAYER CHARACTER NOT FOUND!!!!!!!!!!!!!!!! RESTART THE GAME! RESTART !!!!!!!!!!!!!!!!!!!!");
+        var sceneCharacter = GameObject.Find("Experiment");
+        if (sceneCharacter == null) {
+            var localBody = PlayerCamera.main != null ? PlayerCamera.main.body : null;
+            sceneCharacter = localBody != null ? localBody.transform.root.gameObject : null;
+            if (sceneCharacter == null) {
+                foreach (var candidate in UnityEngine.Object.FindObjectsOfType<Body>()) {
+                    if (candidate.GetComponent<NetBody>() == null && !candidate.CompareTag("Enemy") && candidate.transform.childCount > 0) {
+                        sceneCharacter = candidate.transform.root.gameObject;
+                        break;
                     }
                 }
             }
         }
-
-
+        if (sceneCharacter != null) {
+            SaveHingeStatesAndKeepPrefab(sceneCharacter);
+        } else if (Net.IsRunning) {
+            Multiplayer.DoMultiplayerStatusMessageError("PLAYER CHARACTER NOT FOUND!!!!!!!!!!!!!!!! RESTART THE GAME! RESTART !!!!!!!!!!!!!!!!!!!!");
+        }
     }
 
 

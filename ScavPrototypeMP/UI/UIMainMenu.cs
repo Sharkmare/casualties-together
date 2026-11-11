@@ -1196,6 +1196,19 @@ public static class UIMainMenu {
                 _GUI___DirectConnect_DoSteamInfoo(r2, fieldheight, fieldnameswidth, fieldswidth);
             }
 
+            GUILayout.BeginHorizontal(GUILayout.Height(fieldheight));
+            {
+                GUI.skin.label.alignment = TextAnchor.MiddleRight;
+                GUILayout.Label("Character:  ", GUILayout.Width(fieldnameswidth));
+                if (GUILayout.Button(CharacterChoice.Label(LocalCharacter.Current), GUILayout.Width(fieldswidth))) {
+                    LocalCharacter.Cycle();
+                }
+                GUI.skin.label.alignment = TextAnchor.MiddleLeft;
+                GUILayout.Label("  used when the run starts");
+                GUILayout.FlexibleSpace();
+            }
+            GUILayout.EndHorizontal();
+
             {
                 _GUI___DirectConnect_DoPasswordField(r2, fieldheight, fieldnameswidth, fieldswidth); // PASSWORD
             }
@@ -2497,6 +2510,15 @@ public static class UIMainMenu {
             GUI.enabled = ogeneabled;
             DoTooltipOnLastGUIRect(activatethisbutton ? "mmst_button_deactivate_mp_desc" : "mmst_button_deactivate_mp_desc_disabled");
                
+            GUILayout.FlexibleSpace();
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        {
+            if (GUILayout.Button("Character: " + CharacterChoice.Label(LocalCharacter.Current))) {
+                LocalCharacter.Cycle();
+            }
             GUILayout.FlexibleSpace();
         }
         GUILayout.EndHorizontal();

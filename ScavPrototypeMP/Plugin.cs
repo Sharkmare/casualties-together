@@ -588,6 +588,21 @@ namespace Together {
                 if (arg == ("--mp-setstartdebug")) {
                     startworld = 2;
                 }
+                if (arg == ("--mp-mychar")) {
+                    i++; if (i == args.Length) break; arg = args[i];
+                    if (int.TryParse(arg, out int myCharacter) && myCharacter >= 0 && myCharacter <= CharacterTable.MaxId) LocalCharacter.SessionOverride = myCharacter;
+                    else log.LogError($"CMD: --mp-mychar: \"{arg}\" is not between 0 and {CharacterTable.MaxId}");
+                    continue;
+                }
+                if (arg == ("--mp-test-character")) {
+                    i++; if (i == args.Length) break; arg = args[i];
+                    var testParts = arg.Split(':');
+                    if (testParts.Length != 3 || !byte.TryParse(testParts[0], out byte testId) || !byte.TryParse(testParts[2], out byte testBase)
+                        || !TogetherCharacters.Register(testId, testParts[1], testBase)) {
+                        log.LogError($"CMD: --mp-test-character: \"{arg}\" must be ID:NAME:BASE with a free id from 3 and a base of 0, 1 or 2");
+                    }
+                    continue;
+                }
                 if (arg == ("--mp-verbose")) {
                     DebugMenuSettings.is_verbose = true;
                     DebugMenuSettings._DEV_VISUALISE_NET_EVENTS = true;

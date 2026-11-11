@@ -518,6 +518,7 @@ public class SyncBody : PredictableEntityLogic {
     protected override void RegisterRPC(ref RPCRegistrator r) {
         base.RegisterRPC(ref r);
 
+        r.BindOnChange(this, ref characterSelected, (e) => { CharacterSetup.OnReplicatedCharacterChanged(this); }, BindOnChangeFlags.ExecuteOnSync);
         r.BindOnChange(this, ref _velocity, (e) => { OnVelocityUpdate(); }, BindOnChangeFlags.ExecuteOnSync);
         r.BindOnChange(this, ref _moveDir, (e) => { OnMoveDirUpdate(); }, BindOnChangeFlags.ExecuteOnSync);
         r.BindOnChange(this, ref Unchipped, (e) => { OnUnchippedChange(); }, BindOnChangeFlags.ExecuteOnSync);

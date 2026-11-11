@@ -254,6 +254,17 @@ public static class SettingsMenu_Start_MultiplayerPatch {
                             rect.offsetMax -= Vector2.one * 10f;
                         }
 
+                        {
+                            CreateSettingButton("Character: " + CharacterChoice.Label(LocalCharacter.Current), ref num, out var characterObject, out var characterButton, out var characterText);
+                            characterButton.onClick.AddListener(() => {
+                                LocalCharacter.Cycle();
+                                characterText.text = "Character: " + CharacterChoice.Label(LocalCharacter.Current);
+                            });
+                            var characterRect = characterObject.GetComponent<RectTransform>();
+                            characterRect.offsetMin += Vector2.one * 10f;
+                            characterRect.offsetMax -= Vector2.one * 10f;
+                        }
+
                         if (UIMainMenu.BuildUpdateButton != null) {
                             UIMainMenu.BuildUpdateButton();
                         }

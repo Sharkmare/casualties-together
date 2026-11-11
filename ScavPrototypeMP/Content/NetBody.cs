@@ -1046,6 +1046,10 @@ public class NetBody : MonoBehaviour {
 
             nb.SetPlayer(plr);
 
+            if (CharacterSetup.RuleChoosesCharacter(out int localRuleCharacter) && nb.IsBodyLocal()) {
+                CharacterSetup.ApplyToLiveBody(nb.GetComponent<Body>(), localRuleCharacter, plr.playerName, true);
+            }
+
             if (Net.IsServer && had_sb) {
                 var pid = plr.GetPersistentId();
 
@@ -1091,6 +1095,9 @@ public class NetBody : MonoBehaviour {
             return nb;
         } else {
             _Internal_RegisterLiteNetLib(plr.netBody, plr, ref sb);
+            if (CharacterSetup.RuleChoosesCharacter(out int existingBodyCharacter) && plr.body != null && plr.body.IsBodyLocal()) {
+                CharacterSetup.ApplyToLiveBody(plr.body, existingBodyCharacter, plr.playerName, true);
+            }
         }
         return plr.netBody;
     }
@@ -1102,6 +1109,7 @@ public class NetBody : MonoBehaviour {
             if (Net.IsServer) {
                 sb = Net.ServerEntityManager.AddEntity<SyncBody>(e => {
                     e.nb = nb;
+                    if (plr != null) e.characterSelected.Value = CharacterSetup.Server_ResolveFor(plr);
                     if (plr != null) {
                         e.SetParent(plr.BasePlayer);
                     }
@@ -1130,13 +1138,20 @@ public class NetBody : MonoBehaviour {
             name = "bot_" + sb.Id.ToString();
         }
 
-        //TODO sb.characterSelected
-        var chara = UnityEngine.Object.Instantiate(ServerMain.CHARACTER_PREFAB, Vector3.zero, Quaternion.identity);
+        int chosenType = -1;
+        bool hasChosenCharacter = sb != null && CharacterChoice.TryDecode(sb.characterSelected.Value, out chosenType);
+        var chara = UnityEngine.Object.Instantiate(hasChosenCharacter ? CharacterPrefabs.For(CharacterTable.BaseOf(chosenType)) : ServerMain.CHARACTER_PREFAB, Vector3.zero, Quaternion.identity);
         chara.name = "Character_" + name;
+        if (hasChosenCharacter) {
+            CharacterSetup.ApplyBeforeAwake(chara.GetComponentInChildren<Body>(true), chosenType, name);
+        }
         chara.SetActive(true);
 
         var body = chara.GetComponentInChildren<Body>();
         body.name = "Body_" + name;
+        if (hasChosenCharacter) {
+            CharacterSetup.AfterBodyBuilt(body, chosenType, sb.GetParent<BasePlayer>()?.player);
+        }
         body.targetLookPos = new Vector2(1000, 460);
 
         body.transform.position = pos;

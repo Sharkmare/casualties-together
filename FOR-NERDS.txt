@@ -51,6 +51,8 @@ also some commands that require player name as input can accept macros:
 --mp-immidiate-start	// start the world as soon as the game initializes 
 --mp-setstarttutorial  // requires immidiate start, makes the world start in tutorial
 --mp-verbose			// logs more info about synchronization (useful for reporing bugs)
+--mp-setchar 2		// same as --mp-setrule PlayerCharacter 2: every player is that character (0 Experiment, 1 Milky, 2 Dune), 255 keeps each own
+--mp-mychar 2		// your own character when you join (0 Experiment, 1 Milky, 2 Dune); also the Character button on the join screen. A host PlayerCharacter rule wins over it
 --mp-ip-port 127.0.0.1:7790   // override ip and port
 --mp-setname My_Custom_User_Name  // override username
 --mp-setpass 123		// override password

@@ -196,7 +196,7 @@ public enum NetmsgId : byte {
     CLIENT_CraftReceipt,
     SERVER_ItemMove,
     CLIENT_SetWindowPos,
-    ___5,
+    SERVER_ReportCharacter,
     ___6,
     ___7,
     ___8,

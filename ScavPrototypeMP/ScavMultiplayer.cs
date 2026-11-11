@@ -186,6 +186,9 @@ public partial struct MultiplayerGameRules : INetSerializeByMemcpy {
     public float PVPMoodDebuff = 0.5f;
     public float PVPDamageMultiplier = 1f;
 
+    [MultiplayerRuleByte(255, "")]
+    public byte PlayerCharacter = 255;
+
     public bool LateJoinAllowed = true;
     public bool LateJoinSpectate = false;
     public bool SpawnOnPlayer = true;
@@ -1917,6 +1920,16 @@ S_LerpFactor: {_entityManager.LerpFactor}";
                 }
 
                 ClientMain._InitializePlayerCharacter();
+
+                if (CharacterSetup.RuleChoosesCharacter(out int sceneRuleCharacter) && PlayerCamera.main?.body != null) {
+                    CharacterSetup.ApplyToLiveBody(PlayerCamera.main.body, sceneRuleCharacter, "local player", true);
+                }
+                if (PlayerCamera.main?.body != null) {
+                    byte localCharacterId = CharacterSetup.LocalCharacterId(PlayerCamera.main.body);
+                    CharacterSetup.ApplyToLiveBody(PlayerCamera.main.body, localCharacterId, "local player", true);
+                    CharacterSetup.AfterBodyBuilt(PlayerCamera.main.body, localCharacterId, ScavPlayer.LocalPlayer);
+                    CharacterSetup.ReportOwnCharacter(localCharacterId);
+                }
             }
 
         }
