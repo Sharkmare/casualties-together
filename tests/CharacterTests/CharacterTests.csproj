@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<RootNamespace>Together.Tests</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\..\ScavPrototypeMP\Extras\CharacterTable.cs" Link="CharacterTable.cs" />
+		<Compile Include="..\..\ScavPrototypeMP\Extras\CharacterChoice.cs" Link="CharacterChoice.cs" />
+	</ItemGroup>
+</Project>
